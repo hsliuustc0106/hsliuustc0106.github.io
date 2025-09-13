@@ -49,7 +49,7 @@ export default function Home() {
             
             {/* Desktop Navigation */}
             <div className="hidden md:flex space-x-8">
-              {['home', 'about', 'publications', 'projects'].map((section) => (
+              {['home', 'about', 'publications', 'projects', 'blogs'].map((section) => (
                 <button
                   key={section}
                   onClick={() => {
@@ -57,6 +57,8 @@ export default function Home() {
                       window.location.href = '/publications';
                     } else if (section === 'projects') {
                       window.location.href = '/projects';
+                    } else if (section === 'blogs') {
+                      window.location.href = '/blogs';
                     } else {
                       scrollToSection(section);
                     }
@@ -94,7 +96,7 @@ export default function Home() {
           {/* Mobile Navigation */}
           {isMenuOpen && (
             <div className="md:hidden pb-4">
-              {['home', 'about', 'publications', 'projects'].map((section) => (
+              {['home', 'about', 'publications', 'projects', 'blogs'].map((section) => (
                 <button
                   key={section}
                   onClick={() => {
@@ -102,6 +104,8 @@ export default function Home() {
                       window.location.href = '/publications';
                     } else if (section === 'projects') {
                       window.location.href = '/projects';
+                    } else if (section === 'blogs') {
+                      window.location.href = '/blogs';
                     } else {
                       scrollToSection(section);
                     }

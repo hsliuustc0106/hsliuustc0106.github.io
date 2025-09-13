@@ -24,6 +24,9 @@ export default function Projects() {
               <Link href="/projects" className="text-indigo-600 dark:text-indigo-400 font-semibold">
                 Projects
               </Link>
+              <Link href="/blogs" className="text-gray-700 dark:text-gray-300 hover:text-indigo-600 dark:hover:text-indigo-400 transition-colors">
+                Blogs
+              </Link>
             </div>
 
             {/* Mobile menu button */}
