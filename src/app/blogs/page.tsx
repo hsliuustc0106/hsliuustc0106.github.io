@@ -107,7 +107,7 @@ export default function Blogs() {
               {
                 title: "vLLM Deep Dive: Anatomy of High-Performance LLM Serving",
                 category: "LLM Serving",
-                date: "March 20, 2024",
+                date: "Sep. 15, 2025",
                 readTime: "15 min read",
                 excerpt: "A comprehensive deep dive into the anatomy of vLLM, exploring its architecture, optimization techniques, and performance characteristics. Learn how vLLM achieves high-throughput serving with PagedAttention, continuous batching, and advanced memory management.",
                 tags: ["vLLM", "LLM Serving", "PagedAttention", "Performance Optimization", "Memory Management"],
@@ -137,26 +137,6 @@ export default function Blogs() {
                 slug: "vllm-optimization-production"
               },
               {
-                title: "Building Scalable AI4Science Pipelines with MindScience",
-                category: "AI4Science",
-                date: "February 10, 2024",
-                readTime: "15 min read",
-                excerpt: "Learn how to build scalable AI4Science pipelines using the MindScience platform. Covers the architecture, specialized suites, and best practices for scientific computing workflows.",
-                tags: ["MindScience", "AI4Science", "Scientific Workflows", "Scalability"],
-                featured: false,
-                slug: "mindscience-pipelines"
-              },
-              {
-                title: "Advanced Techniques in Spatiotemporal Modeling with Graph Neural Networks",
-                category: "AI4Science",
-                date: "January 22, 2024",
-                readTime: "10 min read",
-                excerpt: "Dive deep into spatiotemporal modeling using Graph Neural Networks. Explore message passing architectures, conservation-informed learning, and physics-encoded approaches.",
-                tags: ["Graph Neural Networks", "Spatiotemporal Modeling", "Conservation Laws", "Scientific ML"],
-                featured: false,
-                slug: "spatiotemporal-gnn-modeling"
-              },
-              {
                 title: "Ascend NPU Optimization for Large Language Models",
                 category: "LLM Serving",
                 date: "January 8, 2024",
@@ -165,26 +145,6 @@ export default function Blogs() {
                 tags: ["Ascend NPU", "vLLM-Ascend", "Hardware Acceleration", "LLM Optimization"],
                 featured: false,
                 slug: "ascend-npu-llm-optimization"
-              },
-              {
-                title: "From CFD to Neural ODEs: The Evolution of Computational Fluid Dynamics",
-                category: "AI4Science",
-                date: "December 18, 2023",
-                readTime: "14 min read",
-                excerpt: "Trace the evolution of computational fluid dynamics from traditional finite element methods to modern neural approaches. Explore how AI is transforming CFD simulations.",
-                tags: ["Computational Fluid Dynamics", "Neural ODEs", "Finite Element Methods", "Scientific Computing"],
-                featured: false,
-                slug: "cfd-evolution-neural-odes"
-              },
-              {
-                title: "Distributed LLM Inference: Scaling Beyond Single GPUs",
-                category: "LLM Serving",
-                date: "November 30, 2023",
-                readTime: "9 min read",
-                excerpt: "Learn how to scale LLM inference across multiple GPUs and nodes. Covers distributed serving architectures, load balancing, and fault tolerance strategies.",
-                tags: ["Distributed Systems", "LLM Inference", "Multi-GPU", "Scalability"],
-                featured: false,
-                slug: "distributed-llm-inference"
               },
               {
                 title: "Conservation Laws in Machine Learning: Theory and Practice",
