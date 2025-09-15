@@ -58,6 +58,16 @@ export default function Blogs() {
             {/* Blog Post Cards */}
             {[
               {
+                title: "DeepSeek-MoE Inference: Optimizing Mixture of Experts for Production",
+                category: "LLM Serving",
+                date: "March 25, 2024",
+                readTime: "18 min read",
+                excerpt: "Deep dive into DeepSeek-MoE inference optimization, exploring expert routing strategies, memory management, and performance tuning for production deployments. Learn advanced techniques for scaling Mixture of Experts models with vLLM and distributed serving architectures.",
+                tags: ["DeepSeek-MoE", "Mixture of Experts", "LLM Serving", "vLLM", "Expert Routing", "Performance Optimization"],
+                featured: true,
+                slug: "deepseek-moe-inference-optimization"
+              },
+              {
                 title: "vLLM Deep Dive: Anatomy of High-Performance LLM Serving",
                 category: "LLM Serving",
                 date: "March 20, 2024",
@@ -73,10 +83,11 @@ export default function Blogs() {
                 category: "AI4Science",
                 date: "March 15, 2024",
                 readTime: "12 min read",
-                excerpt: "Explore the fundamentals of Physics-Informed Neural Networks (PINNs) and their applications in scientific computing. Learn how to integrate physical laws into neural network architectures for solving complex PDEs.",
+                excerpt: "Explore the fundamentals of Physics-Informed Neural Networks (PINNs) and their applications in scientific computing. Learn how to integrate physical laws into neural network architectures for solving complex PDEs. Includes detailed video explanation of core concepts.",
                 tags: ["PINNs", "Physics-Informed ML", "Scientific Computing", "Neural ODEs"],
                 featured: true,
-                slug: "physics-informed-neural-networks-guide"
+                slug: "physics-informed-neural-networks-guide",
+                videoUrl: "https://www.youtube.com/watch?v=-zrY7P2dVC4"
               },
               {
                 title: "Optimizing vLLM for Production: Performance Tips and Best Practices",
@@ -202,29 +213,45 @@ export default function Blogs() {
                   
                   {/* Read More Button */}
                   <div className="flex justify-between items-center">
-                    {post.externalLink ? (
-                      <a 
-                        href={post.externalLink}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="inline-flex items-center px-4 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 transition-colors text-sm font-medium"
-                      >
-                        <svg className="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
-                        </svg>
-                        Read on vLLM Blog
-                      </a>
-                    ) : (
-                      <Link 
-                        href={`/blogs/${post.slug}`}
-                        className="inline-flex items-center px-4 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 transition-colors text-sm font-medium"
-                      >
-                        <svg className="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.746 0 3.332.477 4.5 1.253v13C19.832 18.477 18.246 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" />
-                        </svg>
-                        Read Full Article
-                      </Link>
-                    )}
+                    <div className="flex gap-3">
+                      {post.externalLink ? (
+                        <a 
+                          href={post.externalLink}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="inline-flex items-center px-4 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 transition-colors text-sm font-medium"
+                        >
+                          <svg className="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
+                          </svg>
+                          Read on vLLM Blog
+                        </a>
+                      ) : (
+                        <Link 
+                          href={`/blogs/${post.slug}`}
+                          className="inline-flex items-center px-4 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 transition-colors text-sm font-medium"
+                        >
+                          <svg className="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.746 0 3.332.477 4.5 1.253v13C19.832 18.477 18.246 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" />
+                          </svg>
+                          Read Full Article
+                        </Link>
+                      )}
+                      
+                      {post.videoUrl && (
+                        <a 
+                          href={post.videoUrl}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="inline-flex items-center px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors text-sm font-medium"
+                        >
+                          <svg className="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M14.828 14.828a4 4 0 01-5.656 0M9 10h1m4 0h1m-6 4h10a2 2 0 002-2V8a2 2 0 00-2-2H8a2 2 0 00-2 2v4a2 2 0 002 2z" />
+                          </svg>
+                          Video Explanation
+                        </a>
+                      )}
+                    </div>
                     
                     <div className="flex items-center space-x-3">
                       <button className="text-gray-400 hover:text-red-500 transition-colors">
