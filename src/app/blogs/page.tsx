@@ -58,6 +58,38 @@ export default function Blogs() {
             {/* Blog Post Cards */}
             {[
               {
+                title: "DeepSeek Model Structure Analysis: MLA, MTP, and MoE Deep Dive",
+                category: "LLM Serving",
+                date: "March 26, 2024",
+                readTime: "22 min read",
+                excerpt: "Comprehensive analysis of DeepSeek model architecture components: Multi-head Latent Attention (MLA), Multi-Token Prediction (MTP), and Mixture of Experts (MoE). Explore the technical foundations that enable DeepSeek's high-performance inference capabilities with detailed architectural insights and implementation analysis.",
+                tags: ["DeepSeek", "MLA", "MTP", "MoE", "Model Architecture", "LLM Serving", "Technical Analysis"],
+                featured: true,
+                slug: "deepseek-model-structure-analysis",
+                seriesInfo: {
+                  name: "DeepSeek-MoE Inference Series",
+                  part: "Part 1",
+                  totalParts: 5
+                },
+                referenceLinks: [
+                  {
+                    title: "Multi-head Latent Attention (MLA)",
+                    url: "https://zhuanlan.zhihu.com/p/16730036197",
+                    description: "Technical deep dive into MLA architecture"
+                  },
+                  {
+                    title: "Multi-Token Prediction (MTP)",
+                    url: "https://zhuanlan.zhihu.com/p/18056041194",
+                    description: "Understanding MTP implementation and benefits"
+                  },
+                  {
+                    title: "Mixture of Experts (MoE)",
+                    url: "https://zhuanlan.zhihu.com/p/18565423596",
+                    description: "MoE architecture and scaling strategies"
+                  }
+                ]
+              },
+              {
                 title: "DeepSeek-MoE Inference: Optimizing Mixture of Experts for Production",
                 category: "LLM Serving",
                 date: "March 25, 2024",
@@ -65,7 +97,12 @@ export default function Blogs() {
                 excerpt: "Deep dive into DeepSeek-MoE inference optimization, exploring expert routing strategies, memory management, and performance tuning for production deployments. Learn advanced techniques for scaling Mixture of Experts models with vLLM and distributed serving architectures.",
                 tags: ["DeepSeek-MoE", "Mixture of Experts", "LLM Serving", "vLLM", "Expert Routing", "Performance Optimization"],
                 featured: true,
-                slug: "deepseek-moe-inference-optimization"
+                slug: "deepseek-moe-inference-optimization",
+                seriesInfo: {
+                  name: "DeepSeek-MoE Inference Series",
+                  part: "Series Overview",
+                  totalParts: 5
+                }
               },
               {
                 title: "vLLM Deep Dive: Anatomy of High-Performance LLM Serving",
@@ -176,6 +213,11 @@ export default function Blogs() {
                             Featured
                           </span>
                         )}
+                        {post.seriesInfo && (
+                          <span className="px-2 py-1 bg-indigo-100 dark:bg-indigo-900/30 text-indigo-800 dark:text-indigo-300 rounded-full text-xs font-medium">
+                            {post.seriesInfo.part}
+                          </span>
+                        )}
                       </div>
                       
                       <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-2 hover:text-indigo-600 dark:hover:text-indigo-400 transition-colors cursor-pointer">
@@ -189,6 +231,14 @@ export default function Blogs() {
                           </Link>
                         )}
                       </h2>
+                      
+                      {post.seriesInfo && (
+                        <div className="mb-2">
+                          <p className="text-sm text-indigo-600 dark:text-indigo-400 font-medium">
+                            📚 {post.seriesInfo.name} • {post.seriesInfo.part} of {post.seriesInfo.totalParts}
+                          </p>
+                        </div>
+                      )}
                       
                       <div className="flex items-center text-sm text-gray-500 dark:text-gray-400 mb-3">
                         <time dateTime={post.date}>{post.date}</time>
@@ -210,6 +260,33 @@ export default function Blogs() {
                       </span>
                     ))}
                   </div>
+                  
+                  {/* Reference Links */}
+                  {post.referenceLinks && (
+                    <div className="mb-4 p-3 bg-blue-50 dark:bg-blue-900/20 rounded-lg border border-blue-200 dark:border-blue-800">
+                      <h4 className="text-sm font-semibold text-blue-800 dark:text-blue-300 mb-2">
+                        🔗 Key References:
+                      </h4>
+                      <div className="space-y-2">
+                        {post.referenceLinks.map((link, linkIndex) => (
+                          <div key={linkIndex} className="flex items-start">
+                            <span className="w-1 h-1 bg-blue-500 rounded-full mt-2 mr-2 flex-shrink-0"></span>
+                            <div>
+                              <a 
+                                href={link.url}
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                className="text-sm font-medium text-blue-700 dark:text-blue-300 hover:text-blue-900 dark:hover:text-blue-100 transition-colors"
+                              >
+                                {link.title}
+                              </a>
+                              <p className="text-xs text-gray-600 dark:text-gray-400">{link.description}</p>
+                            </div>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  )}
                   
                   {/* Read More Button */}
                   <div className="flex justify-between items-center">
