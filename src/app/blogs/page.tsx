@@ -58,6 +58,16 @@ export default function Blogs() {
             {/* Blog Post Cards */}
             {[
               {
+                title: "Attention-FFN Disaggregation: Optimizing Transformer Inference Through Component Separation",
+                category: "LLM Serving",
+                date: "January 15, 2025",
+                readTime: "12 min read",
+                excerpt: "Explore a novel optimization technique that separates attention and feed-forward network computations in transformers to achieve better resource utilization, reduced memory overhead, and improved throughput. Learn how component-specific optimizations can unlock significant performance improvements in LLM serving systems.",
+                tags: ["Transformer Optimization", "LLM Serving", "vLLM", "Performance Optimization", "Memory Management", "Attention Mechanisms"],
+                featured: true,
+                slug: "attention-ffn-disaggregation"
+              },
+              {
                 title: "DeepSeek Model Structure Analysis: MLA, MTP, and MoE Deep Dive",
                 category: "LLM Serving",
                 date: "March 26, 2024",
