@@ -25,6 +25,19 @@ export interface BlogPost {
   }[];
 }
 
+export interface BlogListingEntry {
+  title: string;
+  category: string;
+  date: string;
+  readTime: string;
+  excerpt: string;
+  tags: string[];
+  featured: boolean;
+  slug: string;
+  videoUrl?: string;
+  externalLink?: string;
+}
+
 /**
  * Generate a blog page component file content
  * @param blog The blog post data
@@ -152,7 +165,7 @@ export default function ${blog.slug.replace(/-/g, '')}() {
  * @param blog The blog post data
  * @returns The blog entry object for the blogs page
  */
-export function generateBlogListingEntry(blog: BlogPost): any {
+export function generateBlogListingEntry(blog: BlogPost): BlogListingEntry {
   return {
     title: blog.title,
     category: blog.category,
