@@ -6,7 +6,8 @@
     "dev": "next dev --turbopack",
     "build": "next build --turbopack",
     "start": "next start",
-    "lint": "eslint"
+    "lint": "eslint",
+    "init-blog-system": "node scripts/init-blog-system.js"
   },
   "dependencies": {
     "react": "19.1.0",
