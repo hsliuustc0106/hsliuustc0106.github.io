@@ -3,7 +3,7 @@ import fs from 'fs';
 import path from 'path';
 import { BlogPost, generateBlogPageComponent, generateBlogListingEntry } from '@/lib/blogUtils';
 
-export const dynamic = 'force-static';
+export const dynamic = 'force-dynamic';
 
 // Helper function to get the blogs directory path
 const getBlogsDir = () => path.join(process.cwd(), 'src', 'app', 'blogs');
@@ -130,21 +130,37 @@ function updateBlogsListing(blog: BlogPost, action: 'create' | 'update' | 'delet
     const blogsListingPath = getBlogsListingPath();
     
     if (fs.existsSync(blogsListingPath)) {
-      const content = fs.readFileSync(blogsListingPath, 'utf8');
+      let content = fs.readFileSync(blogsListingPath, 'utf8');
       
-      if (action === 'create' || action === 'update') {
-        const blogEntry = generateBlogListingEntry(blog);
-        // In a real implementation, you would properly insert/update the blog entry
-        // in the blogs array in the blogs/page.tsx file
-        console.log('Blog entry for listing:', blogEntry);
+      if (action === 'create') {
+        // Find the blogs array and add the new blog
+        const blogEntry = `              {
+                title: "${blog.title}",
+                category: "${blog.category}",
+                date: "${blog.date}",
+                readTime: "${blog.readTime}",
+                excerpt: "${blog.excerpt}",
+                tags: ${JSON.stringify(blog.tags)},
+                featured: ${blog.featured},
+                slug: "${blog.slug}"
+              },`;
+        
+        // Insert the new blog at the beginning of the array
+        const arrayStartPattern = /(\{\/\* Blog Post Cards \*\/\}\s*\{\[)/;
+        content = content.replace(arrayStartPattern, `$1\n${blogEntry}`);
+        
       } else if (action === 'delete') {
-        // In a real implementation, you would remove the blog entry
-        // from the blogs array in the blogs/page.tsx file
-        console.log('Deleting blog from listing:', blog.slug);
+        // Remove the blog entry from the array
+        const blogPattern = new RegExp(
+          `\\s*\\{[^}]*slug:\\s*["']${blog.slug}["'][^}]*\\},?`,
+          'gs'
+        );
+        content = content.replace(blogPattern, '');
       }
       
-      // For now, we'll just log the action
-      console.log(`Blog ${action} action performed for:`, blog.slug);
+      // Write the updated content back to the file
+      fs.writeFileSync(blogsListingPath, content);
+      console.log(`Blog ${action} action completed for:`, blog.slug);
     }
   } catch (error) {
     console.error('Error updating blogs listing:', error);

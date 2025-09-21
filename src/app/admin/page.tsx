@@ -25,6 +25,21 @@ export default function AdminPanel() {
   const [blogs, setBlogs] = useState<BlogPost[]>([]);
   const [loading, setLoading] = useState(true);
 
+  // Check for existing session on component mount
+  useEffect(() => {
+    const savedSession = localStorage.getItem('adminSession');
+    if (savedSession) {
+      const sessionData = JSON.parse(savedSession);
+      // Check if session is still valid (24 hours)
+      const now = new Date().getTime();
+      if (now - sessionData.timestamp < 24 * 60 * 60 * 1000) {
+        setIsLoggedIn(true);
+      } else {
+        localStorage.removeItem('adminSession');
+      }
+    }
+  }, []);
+
   // Fetch blogs from API
   useEffect(() => {
     if (isLoggedIn) {
@@ -106,9 +121,15 @@ export default function AdminPanel() {
 
   const handleLogin = (e: React.FormEvent) => {
     e.preventDefault();
-    // Simple authentication (in a real app, this would be more secure)
+    // Simple authentication (in production, use proper auth)
     if (username === 'admin' && password === 'password') {
       setIsLoggedIn(true);
+      // Save session to localStorage
+      const sessionData = {
+        timestamp: new Date().getTime(),
+        user: 'admin'
+      };
+      localStorage.setItem('adminSession', JSON.stringify(sessionData));
     } else {
       alert('Invalid credentials');
     }
@@ -118,6 +139,8 @@ export default function AdminPanel() {
     setIsLoggedIn(false);
     setUsername('');
     setPassword('');
+    // Clear session from localStorage
+    localStorage.removeItem('adminSession');
   };
 
   const deleteBlog = async (slug: string) => {
@@ -188,7 +211,7 @@ export default function AdminPanel() {
                   name="username"
                   type="text"
                   required
-                  className="appearance-none rounded-none relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 rounded-t-md focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 focus:z-10 sm:text-sm"
+                  className="appearance-none rounded-none relative block w-full px-3 py-2 border border-gray-300 dark:border-gray-600 placeholder-gray-500 dark:placeholder-gray-400 text-gray-900 dark:text-white bg-white dark:bg-gray-800 rounded-t-md focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 focus:z-10 sm:text-sm"
                   placeholder="Username"
                   value={username}
                   onChange={(e) => setUsername(e.target.value)}
@@ -201,7 +224,7 @@ export default function AdminPanel() {
                   name="password"
                   type="password"
                   required
-                  className="appearance-none rounded-none relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 rounded-b-md focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 focus:z-10 sm:text-sm"
+                  className="appearance-none rounded-none relative block w-full px-3 py-2 border border-gray-300 dark:border-gray-600 placeholder-gray-500 dark:placeholder-gray-400 text-gray-900 dark:text-white bg-white dark:bg-gray-800 rounded-b-md focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 focus:z-10 sm:text-sm"
                   placeholder="Password"
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
