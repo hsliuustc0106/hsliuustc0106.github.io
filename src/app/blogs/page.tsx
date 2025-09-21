@@ -113,7 +113,8 @@ export default function Blogs() {
                 tags: ["vLLM", "LLM Serving", "PagedAttention", "Performance Optimization", "Memory Management"],
                 featured: true,
                 slug: "vllm-anatomy-deepdive",
-                externalLink: "https://blog.vllm.ai/2025/09/05/anatomy-of-vllm.html"
+                externalLink: "https://blog.vllm.ai/2025/09/05/anatomy-of-vllm.html",
+                videoUrl: "/videos/Inside_vLLM__High-Speed_AI.mp4"
               },
               {
                 title: "Understanding Physics-Informed Neural Networks: A Comprehensive Guide",
