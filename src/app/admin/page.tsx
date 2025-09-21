@@ -35,13 +35,12 @@ export default function AdminPanel() {
   const fetchBlogs = async () => {
     try {
       setLoading(true);
-      // In a real implementation, this would fetch from your API
-      // const response = await fetch('/api/blogs');
-      // const data = await response.json();
-      // setBlogs(data);
-      
-      // For now, we'll use mock data
-      setTimeout(() => {
+      const response = await fetch('/api/blogs');
+      if (response.ok) {
+        const data = await response.json();
+        setBlogs(data);
+      } else {
+        // Fallback to mock data if API fails
         setBlogs([
           {
             id: '1',
@@ -69,10 +68,38 @@ export default function AdminPanel() {
             videoUrl: '/videos/Inside_vLLM__High-Speed_AI.mp4'
           }
         ]);
-        setLoading(false);
-      }, 500);
+      }
+      setLoading(false);
     } catch (error) {
       console.error('Error fetching blogs:', error);
+      // Fallback to mock data on error
+      setBlogs([
+        {
+          id: '1',
+          title: 'Attention-FFN Disaggregation: Optimizing Transformer Inference Through Component Separation',
+          slug: 'attention-ffn-disaggregation',
+          category: 'LLM Serving',
+          date: 'January 15, 2025',
+          readTime: '12 min read',
+          excerpt: 'Explore a novel optimization technique that separates attention and feed-forward network computations in transformers to achieve better resource utilization, reduced memory overhead, and improved throughput. Learn how component-specific optimizations can unlock significant performance improvements in LLM serving systems.',
+          content: 'Full blog content would be editable here...',
+          tags: ['Transformer Optimization', 'LLM Serving', 'vLLM', 'Performance Optimization', 'Memory Management', 'Attention Mechanisms'],
+          featured: true
+        },
+        {
+          id: '2',
+          title: 'vLLM Deep Dive: Anatomy of High-Performance LLM Serving',
+          slug: 'vllm-anatomy-deepdive',
+          category: 'LLM Serving',
+          date: 'Sep. 15, 2025',
+          readTime: '15 min read',
+          excerpt: 'A comprehensive deep dive into the anatomy of vLLM, exploring its architecture, optimization techniques, and performance characteristics. Learn how vLLM achieves high-throughput serving with PagedAttention, continuous batching, and advanced memory management.',
+          content: 'Full blog content would be editable here...',
+          tags: ['vLLM', 'LLM Serving', 'PagedAttention', 'Performance Optimization', 'Memory Management'],
+          featured: true,
+          videoUrl: '/videos/Inside_vLLM__High-Speed_AI.mp4'
+        }
+      ]);
       setLoading(false);
     }
   };
@@ -96,9 +123,12 @@ export default function AdminPanel() {
   const deleteBlog = async (slug: string) => {
     if (confirm('Are you sure you want to delete this blog?')) {
       try {
-        // In a real implementation, this would call your API
-        // await fetch(`/api/blogs?slug=${slug}`, { method: 'DELETE' });
-        setBlogs(blogs.filter(blog => blog.slug !== slug));
+        const response = await fetch(`/api/blogs?slug=${slug}`, { method: 'DELETE' });
+        if (response.ok) {
+          setBlogs(blogs.filter(blog => blog.slug !== slug));
+        } else {
+          alert('Failed to delete blog');
+        }
       } catch (error) {
         console.error('Error deleting blog:', error);
         alert('Failed to delete blog');
@@ -106,7 +136,7 @@ export default function AdminPanel() {
     }
   };
 
-  const createNewBlog = () => {
+  const createNewBlog = async () => {
     const newBlog: BlogPost = {
       id: Date.now().toString(),
       title: 'New Blog Post',
@@ -119,7 +149,25 @@ export default function AdminPanel() {
       tags: ['New Tag'],
       featured: false
     };
-    setBlogs([newBlog, ...blogs]);
+    
+    try {
+      const response = await fetch('/api/blogs', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(newBlog),
+      });
+      
+      if (response.ok) {
+        setBlogs([newBlog, ...blogs]);
+      } else {
+        alert('Failed to create new blog');
+      }
+    } catch (error) {
+      console.error('Error creating blog:', error);
+      alert('Failed to create new blog');
+    }
   };
 
   if (!isLoggedIn) {
