@@ -109,7 +109,7 @@ export default function VLLMAnatomyDeepDive() {
                   🎥 Video Explanation
                 </p>
                 <p className="text-sm text-red-700 dark:text-red-400 mb-3">
-                  Watch an in-depth video explanation of vLLM's architecture and high-performance serving techniques.
+                  Watch an in-depth video explanation of vLLM&apos;s architecture and high-performance serving techniques.
                 </p>
                 <a 
                   href="/videos/Inside_vLLM__High-Speed_AI.mp4"
