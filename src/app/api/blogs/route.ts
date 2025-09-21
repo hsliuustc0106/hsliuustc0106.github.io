@@ -3,6 +3,8 @@ import fs from 'fs';
 import path from 'path';
 import { BlogPost, generateBlogPageComponent, generateBlogListingEntry } from '@/lib/blogUtils';
 
+export const dynamic = 'force-static';
+
 // Helper function to get the blogs directory path
 const getBlogsDir = () => path.join(process.cwd(), 'src', 'app', 'blogs');
 
@@ -128,7 +130,7 @@ function updateBlogsListing(blog: BlogPost, action: 'create' | 'update' | 'delet
     const blogsListingPath = getBlogsListingPath();
     
     if (fs.existsSync(blogsListingPath)) {
-      let content = fs.readFileSync(blogsListingPath, 'utf8');
+      const content = fs.readFileSync(blogsListingPath, 'utf8');
       
       if (action === 'create' || action === 'update') {
         const blogEntry = generateBlogListingEntry(blog);

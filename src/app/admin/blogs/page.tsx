@@ -175,7 +175,7 @@ Future work will focus on extending these techniques to other transformer compon
     }
   };
 
-  const handleChange = (field: keyof BlogPost, value: any) => {
+  const handleChange = (field: keyof BlogPost, value: string | boolean | string[]) => {
     if (!blog) return;
     setBlog({ ...blog, [field]: value });
   };
