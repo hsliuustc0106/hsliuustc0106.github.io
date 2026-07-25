@@ -353,11 +353,10 @@ class OptimizedFFN(torch.nn.Module):
           <div className="mt-16 p-6 bg-gray-50 dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700">
             <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">About the Author</h3>
             <p className="text-sm text-gray-700 dark:text-gray-400 leading-relaxed">
-              <strong>Hongsheng Liu</strong> is a specialist in AI4Science and LLM serving with extensive experience in 
-              MindSpore Science (as maintainer), vLLM & vLLM-Ascend, and performance optimization on Ascend NPUs. 
-              His research focuses on physics-informed machine learning, high-performance AI system deployment, 
-              and distributed computing. He has contributed to numerous open-source projects and published 
-              research on spatiotemporal dynamics prediction and efficient neural PDE solvers.
+              <strong>Hongsheng Liu</strong> is a core maintainer of vLLM-Omni and AFD Plugin and a member of the
+              vLLM Project team. His current work focuses on high-performance multimodal model inference,
+              distributed serving, and open-source AI infrastructure. His research background includes
+              AI4Science, spatiotemporal dynamics prediction, and efficient neural PDE solvers.
             </p>
           </div>
 

@@ -249,8 +249,8 @@ export default function VLLMAnatomyDeepDive() {
             
             <div className="pt-4 border-t border-blue-200 dark:border-blue-700">
               <p className="text-sm text-blue-700 dark:text-blue-400">
-                <strong>About the Author:</strong> Specialist in LLM serving with extensive experience in vLLM and vLLM-Ascend systems, 
-                contributing to optimizing large language model inference for production deployments.
+                <strong>About the Author:</strong> Hongsheng Liu is a core maintainer of vLLM-Omni and AFD Plugin
+                and a member of the vLLM Project team, focused on high-performance multimodal model inference and serving.
               </p>
             </div>
           </div>
