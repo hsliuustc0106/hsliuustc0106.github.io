@@ -13,13 +13,13 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "Hongsheng Liu - Research Scientist",
-  description: "Research Scientist at Huawei 2012 Lab specializing in LLM Serving (vLLM & vLLM-Ascend) and AI4Science. Expert in large language model optimization and scientific computing.",
-  keywords: "research scientist, LLM serving, vLLM, vLLM-Ascend, AI4Science, Huawei 2012 Lab, machine learning, scientific computing",
+  title: "Hongsheng Liu - vLLM-Omni & AFD Plugin Core Maintainer",
+  description: "Core maintainer of vLLM-Omni and AFD Plugin, member of the vLLM Project team, and Research Scientist at Huawei 2012 Lab focused on high-performance multimodal model serving.",
+  keywords: "vLLM, vLLM-Omni, AFD Plugin, multimodal model serving, attention-FFN disaggregation, LLM inference, distributed systems, open source, Huawei 2012 Lab",
   authors: [{ name: "Hongsheng Liu" }],
   openGraph: {
-    title: "Hongsheng Liu - Research Scientist",
-    description: "Research Scientist specializing in LLM Serving and AI4Science",
+    title: "Hongsheng Liu - vLLM-Omni & AFD Plugin Core Maintainer",
+    description: "Core maintainer of vLLM-Omni and AFD Plugin and member of the vLLM Project team.",
     type: "website",
   },
 };
