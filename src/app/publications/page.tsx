@@ -47,7 +47,7 @@ export default function Publications() {
               Publications
             </h1>
             <p className="text-xl text-gray-600 dark:text-gray-300 mb-4">
-              Research contributions in AI4Science and ML optimization
+              Research contributions in multimodal model serving, AI4Science, and ML optimization
             </p>
             <p className="text-base text-gray-500 dark:text-gray-400 mb-8">
               Each publication includes research diagrams and video explanations of key concepts (videos being added progressively)
@@ -71,6 +71,16 @@ export default function Publications() {
             {/* Publication Cards */}
             {[
               // Sorted by arXiv publication date (newest to oldest)
+              // 2026 Publications
+              {
+                title: "vLLM-Omni: Fully Disaggregated Serving for Any-to-Any Multimodal Models",
+                authors: "Peiqi Yin, Jiangyun Zhu, Han Gao, Chenguang Zheng, Yongxiang Huang, Taichang Zhou, Ruirui Yang, Weizhi Liu, Weiqing Chen, Canlin Guo, Didan Deng, Zifeng Mo, Cong Wang, James Cheng, Roger Wang, Hongsheng Liu",
+                venue: "arXiv:2602.02204 [cs.DC], 2026",
+                type: "LLM Serving",
+                description: "We present vLLM-Omni, a fully disaggregated serving system for any-to-any multimodal models spanning text, images, video, and audio. Its stage abstraction represents complex model architectures as an interconnected graph, while the disaggregated execution backend independently serves each stage with per-stage batching, flexible GPU allocation, and unified connectors. Experiments demonstrate up to a 91.4% reduction in job completion time compared with baseline methods.",
+                paperUrl: "https://arxiv.org/abs/2602.02204",
+                tags: ["vLLM-Omni", "Multimodal Serving", "Any-to-Any Models", "Disaggregated Serving", "Distributed Inference", "LLM Infrastructure"]
+              },
               // 2025 Publications
               {
                 title: "Learnable-Differentiable Finite Volume Solver for Accelerated Simulation of Flows",
@@ -261,15 +271,17 @@ export default function Publications() {
                     
                     {/* Action Buttons */}
                     <div className="flex flex-wrap gap-3">
-                      <a 
-                        href={publication.blogUrl}
-                        className="inline-flex items-center px-4 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 transition-colors text-sm font-medium"
-                      >
-                        <svg className="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.746 0 3.332.477 4.5 1.253v13C19.832 18.477 18.246 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" />
-                        </svg>
-                        Read Blog Post
-                      </a>
+                      {publication.blogUrl ? (
+                        <a
+                          href={publication.blogUrl}
+                          className="inline-flex items-center px-4 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 transition-colors text-sm font-medium"
+                        >
+                          <svg className="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.746 0 3.332.477 4.5 1.253v13C19.832 18.477 18.246 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" />
+                          </svg>
+                          Read Blog Post
+                        </a>
+                      ) : null}
                       {publication.videoUrl ? (
                         <a 
                           href={publication.videoUrl}
