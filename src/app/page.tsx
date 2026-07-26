@@ -302,13 +302,13 @@ export default function Home() {
             </div>
           </div>
           
-          {/* Shared Technologies */}
+          {/* Core Technology Areas */}
           <div className="mt-16 text-center">
             <h4 className="text-xl font-semibold text-gray-900 dark:text-white mb-6">
               Core Technologies
             </h4>
             <div className="flex flex-wrap justify-center gap-2">
-              {['Python', 'PyTorch', 'vLLM', 'vLLM-Omni', 'Distributed Systems'].map((tech) => (
+              {['AI/ML Systems', 'LLM Serving', 'Omni-Modality Model Serving', 'Disaggregated Inference'].map((tech) => (
                 <span key={tech} className="px-3 py-1 bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-300 rounded-full text-sm border border-gray-200 dark:border-gray-600">
                   {tech}
                 </span>
