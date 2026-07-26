@@ -5,7 +5,6 @@
   "scripts": {
     "dev": "next dev --turbopack",
     "build": "next build --turbopack",
-    "build:sites": "npm run build && node scripts/build-sites.mjs",
     "start": "next start",
     "lint": "eslint",
     "init-blog-system": "node scripts/init-blog-system.js"
