@@ -4,8 +4,74 @@ import Link from "next/link";
 export const metadata: Metadata = {
   title: "From AFD Experiment to an Evidence-Driven vLLM Roadmap | HS Liu",
   description:
-    "How the vLLM AFD Plugin separates Attention and FFN serving, what its early results show, and how the project roadmap turns an experimental release into verifiable support claims.",
+    "A code-level analysis of how the vLLM AFD Plugin separates Attention and FFN serving, plus its early results and evidence-driven roadmap.",
 };
+
+const sourceCommit =
+  "https://github.com/vllm-project/afd-plugin/commit/ea7c56add16ec9ef7fb7e03ad592d3be942a88d6";
+const sourceRoot =
+  "https://github.com/vllm-project/afd-plugin/blob/ea7c56add16ec9ef7fb7e03ad592d3be942a88d6";
+
+const codeMap = [
+  {
+    file: "afd_plugin/__init__.py",
+    role: "Plugin bootstrap",
+    detail:
+      "Registers AFD model architectures and installs narrow compatibility hooks through vllm.general_plugins.",
+    href: `${sourceRoot}/afd_plugin/__init__.py`,
+  },
+  {
+    file: "afd_plugin/v1/worker/attention_model_runner.py",
+    role: "Attention control path",
+    detail:
+      "Builds per-stage AFD metadata, injects it into vLLM's ForwardContext, and sends DP shape metadata.",
+    href: `${sourceRoot}/afd_plugin/v1/worker/attention_model_runner.py`,
+  },
+  {
+    file: "afd_plugin/model_executor/models/deepseek_v2.py",
+    role: "Layer split point",
+    detail:
+      "Constructs role-specific modules and replaces the ordinary layer loop with send/receive boundaries around FFN.",
+    href: `${sourceRoot}/afd_plugin/model_executor/models/deepseek_v2.py`,
+  },
+  {
+    file: "afd_plugin/v1/worker/ffn_worker.py",
+    role: "FFN service lifecycle",
+    detail:
+      "Starts the connector-driven daemon, rejects scheduler execution, and allocates no KV cache.",
+    href: `${sourceRoot}/afd_plugin/v1/worker/ffn_worker.py`,
+  },
+  {
+    file: "afd_plugin/v1/worker/ffn_model_runner.py",
+    role: "Expert execution",
+    detail:
+      "Iterates layer and microbatch stages, receives hidden states, calls compute_ffn_output(), and returns results.",
+    href: `${sourceRoot}/afd_plugin/v1/worker/ffn_model_runner.py`,
+  },
+  {
+    file: "afd_plugin/connectors/base.py",
+    role: "Backend-neutral contract",
+    detail:
+      "Defines the four tensor-transfer operations and the separate DP metadata control-plane interface.",
+    href: `${sourceRoot}/afd_plugin/connectors/base.py`,
+  },
+  {
+    file: "afd_plugin/connectors/gpu/p2p.py",
+    role: "CUDA transport",
+    detail:
+      "Implements NCCL subgroup fan-in, token concatenation, output splitting, and graph-stable receive buffers.",
+    href: `${sourceRoot}/afd_plugin/connectors/gpu/p2p.py`,
+  },
+];
+
+const ownershipRows = [
+  ["Request lifecycle and scheduler", "Owns", "None"],
+  ["KV cache and attention", "Owns", "None"],
+  ["Embeddings, norm, residual, sampling", "Owns", "None"],
+  ["Dense or MoE FFN modules", "Role-dependent", "Owns"],
+  ["Expert execution loop", "None", "Connector-driven"],
+  ["Connector and transfer metadata", "Sends / receives", "Receives / sends"],
+];
 
 const workstreams = [
   {
@@ -124,7 +190,7 @@ export default function VllmAfdPluginRoadmap() {
                 LLM Serving
               </span>
               <span className="text-sm text-slate-500 dark:text-slate-400">
-                July 27, 2026 · 11 min read
+                July 27, 2026 · 18 min read
               </span>
             </div>
             <h1 className="mb-6 text-4xl font-bold leading-tight tracking-tight text-slate-950 dark:text-white sm:text-5xl">
@@ -162,6 +228,24 @@ export default function VllmAfdPluginRoadmap() {
                 className="font-medium underline decoration-indigo-400 underline-offset-4"
               >
                 project roadmap RFC
+              </a>
+              , with systems framing inspired by the{" "}
+              <a
+                href="https://gentlecold.top/20260714/fastafd-attention-ffn-disaggregation-analysis/"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="font-medium underline decoration-indigo-400 underline-offset-4"
+              >
+                FastAFD architecture analysis
+              </a>
+              . Code observations are pinned to AFD Plugin commit{" "}
+              <a
+                href={sourceCommit}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="font-mono text-sm font-medium underline decoration-indigo-400 underline-offset-4"
+              >
+                ea7c56a
               </a>
               . The plugin and roadmap are experimental; the performance
               results discussed below are focused validation results, not
@@ -286,6 +370,445 @@ export default function VllmAfdPluginRoadmap() {
                     Graph execution is not yet supported on this path.
                   </p>
                 </div>
+              </div>
+            </section>
+
+            <section id="code-map">
+              <h2 className="mb-5 text-3xl font-bold tracking-tight text-slate-950 dark:text-white">
+                Reading the architecture from the code
+              </h2>
+              <p className="mb-7 text-lg leading-relaxed text-slate-700 dark:text-slate-300">
+                AFD is not implemented as one large fork of vLLM. It is a chain
+                of deliberately small interception points: plugin registration
+                selects AFD-aware workers and model classes; the Attention
+                runner injects execution metadata; the model wrapper introduces
+                the layer boundary; and a connector-driven FFN runner consumes
+                that boundary.
+              </p>
+
+              <div className="overflow-hidden rounded-2xl border border-slate-200 dark:border-slate-800">
+                <div className="overflow-x-auto">
+                  <table className="min-w-full text-left text-sm">
+                    <thead className="bg-slate-100 text-slate-700 dark:bg-slate-900 dark:text-slate-300">
+                      <tr>
+                        <th className="px-5 py-4 font-semibold">Source file</th>
+                        <th className="px-5 py-4 font-semibold">
+                          Runtime responsibility
+                        </th>
+                        <th className="px-5 py-4 font-semibold">
+                          Architectural consequence
+                        </th>
+                      </tr>
+                    </thead>
+                    <tbody className="divide-y divide-slate-200 dark:divide-slate-800">
+                      {codeMap.map((item) => (
+                        <tr key={item.file}>
+                          <td className="px-5 py-4 align-top">
+                            <a
+                              href={item.href}
+                              target="_blank"
+                              rel="noopener noreferrer"
+                              className="font-mono text-xs font-medium text-indigo-600 hover:underline dark:text-indigo-400"
+                            >
+                              {item.file}
+                            </a>
+                          </td>
+                          <td className="px-5 py-4 align-top font-medium text-slate-950 dark:text-white">
+                            {item.role}
+                          </td>
+                          <td className="px-5 py-4 align-top leading-relaxed text-slate-600 dark:text-slate-400">
+                            {item.detail}
+                          </td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+            </section>
+
+            <section id="bootstrap">
+              <h2 className="mb-5 text-3xl font-bold tracking-tight text-slate-950 dark:text-white">
+                1. Bootstrap: change the model lifecycle, not the API
+              </h2>
+              <div className="space-y-5 text-lg leading-relaxed text-slate-700 dark:text-slate-300">
+                <p>
+                  The package exposes{" "}
+                  <code className="rounded bg-slate-100 px-1.5 py-0.5 text-base dark:bg-slate-800">
+                    afd_plugin:register_afd
+                  </code>{" "}
+                  as a{" "}
+                  <code className="rounded bg-slate-100 px-1.5 py-0.5 text-base dark:bg-slate-800">
+                    vllm.general_plugins
+                  </code>{" "}
+                  entry point. Registration maps native architecture names to
+                  plugin-owned wrappers such as{" "}
+                  <code className="rounded bg-slate-100 px-1.5 py-0.5 text-base dark:bg-slate-800">
+                    AFDDeepseekV3ForCausalLM
+                  </code>
+                  . Worker initialization then rewrites the model configuration
+                  to select that registered architecture.
+                </p>
+                <p>
+                  This is why clients still use{" "}
+                  <code className="rounded bg-slate-100 px-1.5 py-0.5 text-base dark:bg-slate-800">
+                    vllm serve
+                  </code>
+                  . The public engine and OpenAI-compatible endpoint remain on
+                  the Attention service; the substitution happens below the
+                  serving interface, at worker and model construction time.
+                </p>
+              </div>
+
+              <div className="mt-7 overflow-hidden rounded-xl bg-slate-950">
+                <div className="border-b border-slate-800 px-4 py-2 text-xs font-semibold uppercase tracking-wider text-slate-400">
+                  Conceptual bootstrap path
+                </div>
+                <pre className="overflow-x-auto p-5 text-sm leading-7 text-slate-200">
+{`vllm serve
+  └─ general_plugins entry point
+      └─ register AFD model architectures
+          └─ parse additional_config["afd"]
+              ├─ role="attention" → AFDAttentionWorker
+              └─ role="ffn"       → AFDFFNWorker
+                  └─ rewrite model architecture → AFD model wrapper`}
+                </pre>
+              </div>
+            </section>
+
+            <section id="ownership">
+              <h2 className="mb-5 text-3xl font-bold tracking-tight text-slate-950 dark:text-white">
+                2. Role-specific construction removes unused state
+              </h2>
+              <p className="mb-7 text-lg leading-relaxed text-slate-700 dark:text-slate-300">
+                The DeepSeek decoder wrapper does more than skip half of a
+                normal forward pass. During construction, each role creates
+                only the modules it needs. The Attention layer builds
+                self-attention and request-facing state; the FFN layer builds
+                dense MLP or MoE modules. On the FFN worker,{" "}
+                <code className="rounded bg-slate-100 px-1.5 py-0.5 text-base dark:bg-slate-800">
+                  get_kv_cache_spec()
+                </code>{" "}
+                returns an empty mapping and sampling is explicitly
+                unsupported.
+              </p>
+
+              <div className="overflow-hidden rounded-2xl border border-slate-200 dark:border-slate-800">
+                <div className="overflow-x-auto">
+                  <table className="min-w-full text-left text-sm">
+                    <thead className="bg-slate-100 dark:bg-slate-900">
+                      <tr>
+                        <th className="px-5 py-4 font-semibold text-slate-700 dark:text-slate-300">
+                          Ownership
+                        </th>
+                        <th className="px-5 py-4 font-semibold text-blue-700 dark:text-blue-300">
+                          Attention worker
+                        </th>
+                        <th className="px-5 py-4 font-semibold text-emerald-700 dark:text-emerald-300">
+                          FFN worker
+                        </th>
+                      </tr>
+                    </thead>
+                    <tbody className="divide-y divide-slate-200 dark:divide-slate-800">
+                      {ownershipRows.map(([item, attention, ffn]) => (
+                        <tr key={item}>
+                          <td className="px-5 py-4 font-medium text-slate-950 dark:text-white">
+                            {item}
+                          </td>
+                          <td className="px-5 py-4 text-slate-600 dark:text-slate-400">
+                            {attention}
+                          </td>
+                          <td className="px-5 py-4 text-slate-600 dark:text-slate-400">
+                            {ffn}
+                          </td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+
+              <p className="mt-5 text-sm leading-relaxed text-slate-500 dark:text-slate-400">
+                One subtlety: normalization and other shared lifecycle
+                components may exist on both role-specific wrappers where the
+                upstream model-loading contract requires them. “Split” means
+                role-required construction, not a blanket claim that every
+                non-expert parameter exists on only one side.
+              </p>
+            </section>
+
+            <section id="layer-flow">
+              <h2 className="mb-5 text-3xl font-bold tracking-tight text-slate-950 dark:text-white">
+                3. One layer, end to end
+              </h2>
+              <p className="mb-7 text-lg leading-relaxed text-slate-700 dark:text-slate-300">
+                The actual split point lives inside the model wrapper&apos;s
+                layer loop. Attention computes through post-attention
+                normalization, sends that hidden state to FFN, and later
+                receives the expert result. The residual stays on the
+                Attention side, preserving request-local transformer state.
+              </p>
+
+              <div className="grid gap-4 md:grid-cols-2">
+                {[
+                  ["01", "Prepare step metadata", "The Attention runner records token counts, stage IDs, graph flags, and a transaction ID in ForwardContext."],
+                  ["02", "Receive the prior FFN result", "From layer 1 onward, Attention first receives the previous layer's returned FFN tensor."],
+                  ["03", "Run Attention locally", "The wrapper executes input norm, self-attention, residual handling, and post-attention norm."],
+                  ["04", "Dispatch the split tensor", "The connector sends the normalized hidden states with layer/stage/token metadata."],
+                  ["05", "Aggregate on FFN", "The GPU P2P path concatenates tensors from the Attention peers mapped to the same FFN rank."],
+                  ["06", "Compute experts", "The FFN runner calls the model wrapper's compute_ffn_output(hidden_states, layer_idx)."],
+                  ["07", "Split and return", "The connector slices the aggregate output by the original per-peer token lengths and sends each slice home."],
+                  ["08", "Complete the model", "After the last dispatch, Attention performs one final receive, then continues to final norm and sampling."],
+                ].map(([number, title, detail]) => (
+                  <div
+                    key={number}
+                    className="flex gap-4 rounded-xl border border-slate-200 p-5 dark:border-slate-800"
+                  >
+                    <span className="font-mono text-sm font-bold text-indigo-600 dark:text-indigo-400">
+                      {number}
+                    </span>
+                    <div>
+                      <h3 className="font-semibold text-slate-950 dark:text-white">
+                        {title}
+                      </h3>
+                      <p className="mt-2 text-sm leading-relaxed text-slate-600 dark:text-slate-400">
+                        {detail}
+                      </p>
+                    </div>
+                  </div>
+                ))}
+              </div>
+
+              <div className="mt-7 overflow-hidden rounded-xl bg-slate-950">
+                <div className="border-b border-slate-800 px-4 py-2 text-xs font-semibold uppercase tracking-wider text-slate-400">
+                  Simplified execution pseudocode
+                </div>
+                <pre className="overflow-x-auto p-5 text-sm leading-7 text-slate-200">
+{`# Attention process
+for layer in layers:
+    previous_ffn = receive_if_pending()
+    attn_state, residual = layer.compute_attention(previous_ffn, residual)
+    send_to_ffn(attn_state, layer_id, microbatch_id)
+final_state = receive_last_ffn()
+sample(final_norm(final_state, residual))
+
+# FFN process: driven by connector metadata, not request scheduling
+for layer_id in layers:
+    for microbatch_id in active_stages:
+        aggregate, transfer = receive_attention_states()
+        expert_output = model.compute_ffn_output(aggregate, layer_id)
+        split_and_return(expert_output, transfer.peer_token_lengths)`}
+                </pre>
+              </div>
+            </section>
+
+            <section id="connector-contract">
+              <h2 className="mb-5 text-3xl font-bold tracking-tight text-slate-950 dark:text-white">
+                4. The connector is a two-plane protocol
+              </h2>
+              <p className="mb-7 text-lg leading-relaxed text-slate-700 dark:text-slate-300">
+                The connector abstraction separates tensor movement from
+                execution coordination. The data plane has four symmetric
+                operations; the control plane carries per-stage DP token counts
+                and warmup or graph-capture state so the FFN side can allocate
+                the correct buffers before tensors arrive.
+              </p>
+
+              <div className="grid gap-5 md:grid-cols-2">
+                <div className="rounded-2xl border border-violet-200 bg-violet-50 p-6 dark:border-violet-900 dark:bg-violet-950/30">
+                  <p className="mb-3 text-xs font-bold uppercase tracking-widest text-violet-600 dark:text-violet-400">
+                    Control plane
+                  </p>
+                  <ul className="space-y-3 text-sm leading-relaxed text-violet-950/80 dark:text-violet-200">
+                    <li>• stage → DP token-count metadata</li>
+                    <li>• graph-capture and warmup flags</li>
+                    <li>• receive shape and reusable-buffer preparation</li>
+                    <li>• triggers the connector-driven FFN step</li>
+                  </ul>
+                </div>
+                <div className="rounded-2xl border border-cyan-200 bg-cyan-50 p-6 dark:border-cyan-900 dark:bg-cyan-950/30">
+                  <p className="mb-3 text-xs font-bold uppercase tracking-widest text-cyan-700 dark:text-cyan-400">
+                    Tensor data plane
+                  </p>
+                  <ul className="space-y-3 font-mono text-sm leading-relaxed text-cyan-950/80 dark:text-cyan-200">
+                    <li>send_attn_output()</li>
+                    <li>recv_attn_output()</li>
+                    <li>send_ffn_output()</li>
+                    <li>recv_ffn_output()</li>
+                  </ul>
+                </div>
+              </div>
+
+              <p className="mt-6 text-lg leading-relaxed text-slate-700 dark:text-slate-300">
+                Each transfer carries backend-neutral{" "}
+                <code className="rounded bg-slate-100 px-1.5 py-0.5 text-base dark:bg-slate-800">
+                  layer_idx
+                </code>
+                ,{" "}
+                <code className="rounded bg-slate-100 px-1.5 py-0.5 text-base dark:bg-slate-800">
+                  stage_idx
+                </code>
+                , and per-peer sequence lengths. Backends can attach their own
+                transfer state without changing the model-facing call sites.
+                That is what lets NCCL P2P, CAMP2P/HCCL, and asynchronous CAM
+                share one layer loop.
+              </p>
+            </section>
+
+            <section id="topology">
+              <h2 className="mb-5 text-3xl font-bold tracking-tight text-slate-950 dark:text-white">
+                5. GPU topology: fan in, compute, fan out
+              </h2>
+              <p className="mb-7 text-lg leading-relaxed text-slate-700 dark:text-slate-300">
+                For{" "}
+                <code className="rounded bg-slate-100 px-1.5 py-0.5 text-base dark:bg-slate-800">
+                  P2pNcclAFDConnector
+                </code>
+                , global ranks are ordered FFN first, then Attention. The
+                current topology requires at least as many Attention ranks as
+                FFN ranks and an integer ratio. Each FFN rank owns one subgroup
+                of consecutive Attention peers.
+              </p>
+
+              <div className="rounded-2xl border border-slate-200 bg-slate-50 p-6 dark:border-slate-800 dark:bg-slate-900">
+                <div className="grid items-center gap-5 md:grid-cols-[1fr_auto_1fr_auto_1fr]">
+                  <div className="space-y-3">
+                    <div className="rounded-lg border border-blue-200 bg-white p-3 text-center text-sm font-medium text-blue-800 dark:border-blue-900 dark:bg-slate-950 dark:text-blue-300">
+                      Attention A0 · t₀ tokens
+                    </div>
+                    <div className="rounded-lg border border-blue-200 bg-white p-3 text-center text-sm font-medium text-blue-800 dark:border-blue-900 dark:bg-slate-950 dark:text-blue-300">
+                      Attention A1 · t₁ tokens
+                    </div>
+                    <div className="rounded-lg border border-blue-200 bg-white p-3 text-center text-sm font-medium text-blue-800 dark:border-blue-900 dark:bg-slate-950 dark:text-blue-300">
+                      Attention A2 · t₂ tokens
+                    </div>
+                  </div>
+                  <div className="text-center text-sm font-semibold text-slate-500 dark:text-slate-400">
+                    concat
+                    <div className="mt-1 text-2xl">→</div>
+                  </div>
+                  <div className="rounded-xl border border-emerald-300 bg-emerald-50 p-5 text-center dark:border-emerald-900 dark:bg-emerald-950/40">
+                    <div className="font-semibold text-emerald-900 dark:text-emerald-200">
+                      FFN F0
+                    </div>
+                    <div className="mt-2 font-mono text-xs text-emerald-700 dark:text-emerald-400">
+                      shape = (t₀+t₁+t₂, hidden)
+                    </div>
+                    <div className="mt-2 text-sm text-emerald-800/80 dark:text-emerald-300">
+                      larger expert batch
+                    </div>
+                  </div>
+                  <div className="text-center text-sm font-semibold text-slate-500 dark:text-slate-400">
+                    split [t₀,t₁,t₂]
+                    <div className="mt-1 text-2xl">→</div>
+                  </div>
+                  <div className="space-y-3">
+                    <div className="rounded-lg border border-violet-200 bg-white p-3 text-center text-sm font-medium text-violet-800 dark:border-violet-900 dark:bg-slate-950 dark:text-violet-300">
+                      result for A0
+                    </div>
+                    <div className="rounded-lg border border-violet-200 bg-white p-3 text-center text-sm font-medium text-violet-800 dark:border-violet-900 dark:bg-slate-950 dark:text-violet-300">
+                      result for A1
+                    </div>
+                    <div className="rounded-lg border border-violet-200 bg-white p-3 text-center text-sm font-medium text-violet-800 dark:border-violet-900 dark:bg-slate-950 dark:text-violet-300">
+                      result for A2
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <p className="mt-6 text-lg leading-relaxed text-slate-700 dark:text-slate-300">
+                The important systems effect is aggregation: FFN sees tokens
+                from several independently scheduled Attention lanes as one
+                expert batch. The cost is a round trip at every split layer.
+                AFD wins only when improved expert utilization and independent
+                capacity planning outweigh communication, synchronization, and
+                the extra FFN devices.
+              </p>
+            </section>
+
+            <section id="pipeline-model">
+              <h2 className="mb-5 text-3xl font-bold tracking-tight text-slate-950 dark:text-white">
+                6. Ubatching turns the round trip into a pipeline
+              </h2>
+              <p className="mb-7 text-lg leading-relaxed text-slate-700 dark:text-slate-300">
+                A synchronous implementation that executes Attention, sends,
+                waits for FFN, receives, and only then starts the next slice
+                would serialize the new boundary. AFD&apos;s stage metadata and
+                ubatch wrapper create multiple in-flight slices so Attention
+                work for one stage can overlap FFN work for another.
+              </p>
+
+              <div className="grid gap-4 md:grid-cols-4">
+                {[
+                  ["Stage 0", "Attention L₀", "bg-blue-100 text-blue-800 dark:bg-blue-950 dark:text-blue-300"],
+                  ["Stage 0", "FFN L₀", "bg-emerald-100 text-emerald-800 dark:bg-emerald-950 dark:text-emerald-300"],
+                  ["Stage 1", "Attention L₀", "bg-blue-100 text-blue-800 dark:bg-blue-950 dark:text-blue-300"],
+                  ["Stage 0", "Attention L₁", "bg-violet-100 text-violet-800 dark:bg-violet-950 dark:text-violet-300"],
+                ].map(([stage, work, color], index) => (
+                  <div key={`${stage}-${work}-${index}`} className="text-center">
+                    <div className={`rounded-lg px-3 py-4 text-sm font-semibold ${color}`}>
+                      {work}
+                    </div>
+                    <div className="mt-2 text-xs text-slate-500 dark:text-slate-400">
+                      {stage}
+                    </div>
+                  </div>
+                ))}
+              </div>
+
+              <div className="mt-7 rounded-2xl border border-slate-200 p-6 dark:border-slate-800">
+                <p className="mb-3 text-xs font-bold uppercase tracking-widest text-slate-500 dark:text-slate-400">
+                  Useful pipeline mental model
+                </p>
+                <div className="overflow-x-auto text-center font-mono text-lg text-slate-950 dark:text-white">
+                  T<sub>step</sub> ≈ startup + max(T<sub>A</sub>, T<sub>F</sub>)
+                  × (mL − 1)
+                </div>
+                <p className="mt-4 text-sm leading-relaxed text-slate-600 dark:text-slate-400">
+                  Here T<sub>A</sub> and T<sub>F</sub> are per-stage Attention
+                  and FFN times, m is the ubatch count, and L is the number of
+                  split layers. This simplified model, also used to reason
+                  about FastAFD-style pipelines, explains why balance matters:
+                  steady state is limited by the slower side. It is not a
+                  performance formula implemented by the plugin.
+                </p>
+              </div>
+
+              <p className="mt-6 text-lg leading-relaxed text-slate-700 dark:text-slate-300">
+                More stages are not automatically better. They create overlap
+                but also multiply small-kernel launches, metadata handling, and
+                graph shapes. The currently validated DBO path is intentionally
+                limited to exactly two ubatches; the async CAM prefill path owns
+                a separate ubatching mechanism and currently does not support
+                graph execution.
+              </p>
+            </section>
+
+            <section id="failure-boundaries">
+              <h2 className="mb-5 text-3xl font-bold tracking-tight text-slate-950 dark:text-white">
+                7. The code makes invalid ownership fail fast
+              </h2>
+              <div className="grid gap-5 md:grid-cols-2">
+                {[
+                  ["No scheduler-driven FFN", "AFDFFNWorker.execute_model() raises instead of silently running request work on the expert service."],
+                  ["No FFN KV cache", "The FFN worker returns an empty KV-cache specification and skips cache allocation."],
+                  ["No sampling on FFN", "GPUFFNModelRunner.sample_tokens() raises; token selection remains request-local on Attention."],
+                  ["Exact role validation", "Both model runners parse the same AFD config with an expected role, catching mismatched launches early."],
+                  ["Shape-checked transfers", "Connector metadata validates the leading token dimension before send and return operations."],
+                  ["Backend isolation", "Connector-specific configuration and transfer state stay behind the factory and base contract."],
+                ].map(([title, detail]) => (
+                  <div
+                    key={title}
+                    className="rounded-xl border border-slate-200 p-5 dark:border-slate-800"
+                  >
+                    <h3 className="font-semibold text-slate-950 dark:text-white">
+                      {title}
+                    </h3>
+                    <p className="mt-2 text-sm leading-relaxed text-slate-600 dark:text-slate-400">
+                      {detail}
+                    </p>
+                  </div>
+                ))}
               </div>
             </section>
 
@@ -514,6 +1037,19 @@ export default function VllmAfdPluginRoadmap() {
                     className="hover:text-indigo-600 hover:underline dark:hover:text-indigo-400"
                   >
                     vLLM AFD Plugin repository
+                  </a>
+                </li>
+                <li className="flex gap-3">
+                  <span className="font-semibold text-indigo-600 dark:text-indigo-400">
+                    4.
+                  </span>
+                  <a
+                    href="https://gentlecold.top/20260714/fastafd-attention-ffn-disaggregation-analysis/"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="hover:text-indigo-600 hover:underline dark:hover:text-indigo-400"
+                  >
+                    FastAFD architecture and performance analysis
                   </a>
                 </li>
               </ol>

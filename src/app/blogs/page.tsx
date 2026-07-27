@@ -61,9 +61,9 @@ export default function Blogs() {
                 title: "From AFD Experiment to an Evidence-Driven vLLM Roadmap",
                 category: "LLM Serving",
                 date: "July 27, 2026",
-                readTime: "11 min read",
-                excerpt: "The vLLM AFD Plugin makes Attention and FFN independently deployable. Explore its architecture and early performance signals, then see how an evidence-driven roadmap turns compatibility, model, backend, and topology claims into six concrete workstreams.",
-                tags: ["vLLM", "AFD", "Mixture of Experts", "Disaggregated Serving", "LLM Infrastructure", "Open Source Roadmap"],
+                readTime: "18 min read",
+                excerpt: "A code-level tour of how the vLLM AFD Plugin separates Attention and FFN: plugin bootstrap, role-specific model construction, per-layer transfers, connector control and data planes, GPU fan-in/fan-out, ubatching, and the evidence-driven roadmap.",
+                tags: ["vLLM", "AFD", "Mixture of Experts", "Architecture", "Code Analysis", "Disaggregated Serving"],
                 featured: true,
                 slug: "vllm-afd-plugin-roadmap",
                 referenceLinks: [
