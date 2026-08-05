@@ -58,6 +58,33 @@ export default function Blogs() {
             {/* Blog Post Cards */}
             {[
               {
+                title: "From DDPM to Stable Diffusion: A Historical Timeline",
+                category: "Deep Learning",
+                date: "August 5, 2026",
+                readTime: "16 min read",
+                excerpt: "How DDPM, faster sampling, CLIP, classifier-free guidance, and latent diffusion converged in the August 2022 Stable Diffusion public release, with a source-linked architecture and implementation walkthrough.",
+                tags: ["Diffusion Models", "DDPM", "Stable Diffusion", "Latent Diffusion", "Classifier-Free Guidance", "Text-to-Image"],
+                featured: true,
+                slug: "ddpm-to-stable-diffusion-timeline",
+                referenceLinks: [
+                  {
+                    title: "Latent Diffusion Models",
+                    url: "https://arxiv.org/abs/2112.10752",
+                    description: "The compressed representation and cross-attention foundation"
+                  },
+                  {
+                    title: "Stable Diffusion Public Release",
+                    url: "https://stability.ai/news-updates/stable-diffusion-public-release",
+                    description: "The August 22, 2022 release announcement"
+                  },
+                  {
+                    title: "CompVis Stable Diffusion",
+                    url: "https://github.com/CompVis/stable-diffusion",
+                    description: "Reference architecture, configuration, and sampling code"
+                  }
+                ]
+              },
+              {
                 title: "From AFD Experiment to an Evidence-Driven vLLM Roadmap",
                 category: "LLM Serving",
                 date: "July 27, 2026",
